@@ -1,0 +1,66 @@
+<html>
+	<head>
+		<style>
+			
+		</style>
+		<script type="text/javascript">
+		var ws;
+		
+		function test(){
+			alert(ws.readyState);
+			
+		}
+		
+         function connect()
+         {
+            if ("WebSocket" in window)
+            {
+               //alert("WebSocket is supported by your Browser!");
+               
+               // Let us open a web socket
+               ws = new WebSocket("ws://localhost:9090/pork/producer", "json");
+               alert(ws.readyState);
+				
+               ws.onopen = function()
+               {
+                  // Web Socket is connected, send data using send()
+                  alert("Message is sent...");
+                  ws.send("Message to send");
+                  
+               };
+				
+               ws.onmessage = function (evt) 
+               { 
+                  var received_msg = evt.data;
+                  alert("Message is received...");
+               };
+				
+               ws.onclose = function()
+               { 
+                  // websocket is closed.
+                  alert("Connection is closed..."); 
+               };
+					
+               window.onbeforeunload = function(event) {
+                  socket.close();
+               };
+            }
+            
+            else
+            {
+               // The browser doesn't support WebSocket
+               alert("WebSocket NOT supported by your Browser!");
+            }
+         }
+      </script>
+		
+	</head>
+	<body>
+		
+		<div id="sse">
+         <a href="javascript:connect()">Connect WebSocket</a>
+         <a href="javascript:test()">Connect WebSocket</a>
+      </div>
+		
+	</body>
+</html>
