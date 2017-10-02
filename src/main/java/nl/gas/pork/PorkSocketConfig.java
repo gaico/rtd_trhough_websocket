@@ -13,8 +13,7 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 	@EnableWebSocket
 	public class PorkSocketConfig implements WebSocketConfigurer {
 		private static Logger LOG = LoggerFactory.getLogger(PorkSocketConfig.class);
-	
-	 
+		 
 	    @Bean
 	    public WebSocketHandler thePorkmessageHandler() {
 	        return new PorkmessageHandler();
@@ -24,8 +23,6 @@ import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry
 		public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
 			registry.addHandler(thePorkmessageHandler(), "/pork");
 			LOG.info("Messagehandler started");
-			
-			
 		}
 	 
 	}
