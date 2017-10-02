@@ -1,73 +1,52 @@
 package nl.gas.pork;
 
 import java.io.IOException;
-import java.util.Set;
-import java.util.concurrent.CopyOnWriteArraySet;
-
-import javax.websocket.EncodeException;
-import javax.websocket.OnClose;
-import javax.websocket.OnError;
-import javax.websocket.OnMessage;
-import javax.websocket.OnOpen;
-import javax.websocket.Session;
-import javax.websocket.server.ServerEndpoint;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.socket.CloseStatus;
+import org.springframework.web.socket.TextMessage;
+import org.springframework.web.socket.WebSocketSession;
+import org.springframework.web.socket.handler.TextWebSocketHandler;
 
-import com.google.gson.Gson;
-
-import nl.gas.pork.model.Pork;
-
-@ServerEndpoint(value="/pork/producer")
-public class PorkEndpoint {
-  
-	private static Logger LOG = LoggerFactory.getLogger(PorkEndpoint.class);
-    private Session session;
-    private static Set<PorkEndpoint> porkers = new CopyOnWriteArraySet<PorkEndpoint>();
+public class PorkmessageHandler extends TextWebSocketHandler {
+  	private static Logger LOG = LoggerFactory.getLogger(PorkmessageHandler.class);
+    private static Map<String, WebSocketSession> sessions = Collections.synchronizedMap(new HashMap<String, WebSocketSession>());
     
-    public PorkEndpoint(){
-    	LOG.info("PorkEndpoint created");
+    public PorkmessageHandler(){
+    	LOG.info("PorkmessageHandler created");
     }
     
-    @OnOpen
-    public void onOpen(Session session) throws IOException {
-    	LOG.info("Connection open: " + session.getId());
-        this.session = session;
-        porkers.add(this);
+    @Override
+    public void afterConnectionClosed(WebSocketSession session, CloseStatus status) throws Exception {
+    	sessions.remove(session.getId());
+        LOG.info("Connection closed, session {} removed", session.getId());
     }
  
-    @OnClose
-    public void onClose(Session session) throws IOException {
-    	LOG.info("Connection closed: " + session.getId());
-    	porkers.remove(this);
+    @Override
+    public void afterConnectionEstablished(WebSocketSession session) throws Exception {
+    	sessions.put(session.getId(), session);
+        LOG.info("Added session: {}", session.getId());
+        broadcast(session, "New connection. Id: " + session.getId());
+    }
+ 
+    @Override
+    protected void handleTextMessage(WebSocketSession session, TextMessage textMessage) throws IOException {
+        broadcast(session, textMessage.getPayload());
     }
     
-    @OnMessage
-    public void onMessage(String message, Session session){
-    	LOG.info("Message:" + message);
+    private void broadcast(WebSocketSession sessionFrom, String messageIn) throws IOException{
+    	for(WebSocketSession sessionTo: sessions.values()){
+    		if(!sessionFrom.getId().equals(sessionTo.getId())){//don't want to send to self
+	    		String messageOut = messageIn + " to:" + sessionTo.getId() + " from:" + sessionFrom.getId();
+	    		LOG.info("Sending message: {}", messageOut);
+	    		sessionTo.sendMessage(new TextMessage(messageOut));
+    		}
+    	}
     }
  
-    @OnError
-    public void onError(Session session, Throwable throwable) {
-    	LOG.info("Error:" + session.getId());
-        
-    }
- 
-    public static void broadcast(Pork pork) 
-      throws IOException, EncodeException {
-  
-    	Gson g = new Gson();
-    	String porkJson = g.toJson(pork);
-    	
-    	porkers.forEach(endpoint -> {
-            synchronized (endpoint) {
-                try {
-                    endpoint.session.getBasicRemote().sendText(porkJson);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-    }
+    
 }
