@@ -6,43 +6,47 @@
 		<script type="text/javascript">
 		var ws;
 		
-		function test(){
+		function testSocketState(){
 			alert(ws.readyState);
-			
+		}
+		
+		function sendMessage(){
+			message = document.getElementById('sendit').value;
+			//alert(message);
+			ws.send(message);
+		}
+		
+		function disconnect(){
+			ws.close();
 		}
 		
          function connect()
          {
             if ("WebSocket" in window)
             {
-               //alert("WebSocket is supported by your Browser!");
-               
-               // Let us open a web socket
-               ws = new WebSocket("ws://localhost:9090/pork/producer", "json");
+               //Open a web socket
+               ws = new WebSocket("ws://localhost:9090/pork");
                alert(ws.readyState);
 				
                ws.onopen = function()
                {
-                  // Web Socket is connected, send data using send()
-                  alert("Message is sent...");
-                  ws.send("Message to send");
+                  ws.send("Connection open");
                   
                };
 				
                ws.onmessage = function (evt) 
                { 
                   var received_msg = evt.data;
-                  alert("Message is received...");
+                  alert("Message is received..." + received_msg);
                };
 				
                ws.onclose = function()
                { 
-                  // websocket is closed.
                   alert("Connection is closed..."); 
                };
 					
                window.onbeforeunload = function(event) {
-                  socket.close();
+                  ws.close();
                };
             }
             
@@ -59,7 +63,14 @@
 		
 		<div id="sse">
          <a href="javascript:connect()">Connect WebSocket</a>
-         <a href="javascript:test()">Connect WebSocket</a>
+         <br>
+         <a href="javascript:disconnect()">Close WebSocket connection</a>
+         <br>
+         <a href="javascript:testSocketState()">Test Connection</a>
+         <br>
+         <a href="javascript:sendMessage()">Send messages</a>
+         <input type="text" id="sendit" value='Whatever'/>
+         
       </div>
 		
 	</body>
