@@ -5,5 +5,5 @@
 #https://spring.io/guides/gs/messaging-stomp-websocket/
 #http://benas.github.io/2016/02/21/using-the-java-api-for-webSocket-to-create-a-chat-server.html
 
-#https://plot.ly/
+#https://plot.ly/javascript/getting-started/
 
