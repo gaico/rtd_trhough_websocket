@@ -8,6 +8,7 @@ public class PorkMessage {
 	public String roastName;
 	public String time;
 	public List<SensorOutput> sensors;
+	public List<String> tips;
 	
 	public PorkMessage(){}
 	
@@ -36,7 +37,7 @@ public class PorkMessage {
 	public void setTips(List<String> tips) {
 		this.tips = tips;
 	}
-	public List<String> tips;
+	
 	
 
 }

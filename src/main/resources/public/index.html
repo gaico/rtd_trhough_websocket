@@ -24,7 +24,6 @@
          {
             if ("WebSocket" in window)
             {
-               //Open a web socket
                ws = new WebSocket("ws://localhost:9090/pork");
                alert(ws.readyState);
 				
@@ -36,8 +35,8 @@
 				
                ws.onmessage = function (evt) 
                { 
-                  var received_msg = evt.data;
-                  alert("Message is received..." + received_msg);
+                  handleMessage(evt.data);
+                  
                };
 				
                ws.onclose = function()
@@ -56,22 +55,42 @@
                alert("WebSocket NOT supported by your Browser!");
             }
          }
+         
+         function handleMessage(message){
+        	 var porkMessage = JSON.parse(message);
+        	 var time = porkMessage.time;
+        	 
+        	 var text = document.getElementById('tips').innerHTML;
+        	 for (i = 0; i < porkMessage.tips.length; i++) { 
+        	 	text = time +': '+porkMessage.tips[i] + "<br>" + text;
+        	 }
+        	 document.getElementById('tips').innerHTML = text;
+        	 
+        	 var sensorData = document.getElementById('sensorData').innerHTML;
+        	 for (i = 0; i < porkMessage.sensors.length; i++) { 
+        		 sensorData = porkMessage.sensors[i].name + ': ' + porkMessage.sensors[i].temperature +"&deg;C<br>" + sensorData;
+         	 }
+        	 document.getElementById('sensorData').innerHTML = "<br>" + sensorData;
+         }
       </script>
 		
 	</head>
-	<body>
+	<body style="position:relative">
+	
 		
 		<div id="sse">
-         <a href="javascript:connect()">Connect WebSocket</a>
-         <br>
-         <a href="javascript:disconnect()">Close WebSocket connection</a>
-         <br>
-         <a href="javascript:testSocketState()">Test Connection</a>
-         <br>
-         <a href="javascript:sendMessage()">Send messages</a>
-         <input type="text" id="sendit" value='Whatever'/>
-         
+        	<a href="javascript:connect()">Connect WebSocket</a>
+         	<br>
+         	<a href="javascript:disconnect()">Close WebSocket connection</a>
+         	<br>
+         	<a href="javascript:testSocketState()">Test Connection</a>
+         	<br>
+         	<a href="javascript:sendMessage()">Send messages</a>
+         	<input type="text" id="sendit" value='Whatever'/>
       </div>
+      
+      <div id="sensorData" style="position:absolute;bottom:30%;height:30%;width:100%;border-style:solid;overflow: scroll;"><H2>Sensordata</H2></div>
+      <div id="tips" style="position:absolute;bottom:0;height:30%;width:100%;border-style:solid;overflow: scroll;"><H2>TIPS</H2></div>
 		
 	</body>
 </html>
