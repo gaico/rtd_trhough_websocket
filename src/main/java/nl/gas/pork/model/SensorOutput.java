@@ -13,8 +13,7 @@ public class SensorOutput {
 		this.name = name;
 		this.id = id;
 	}
-	
-	
+		
 	public String getId() {
 		return id;
 	}
