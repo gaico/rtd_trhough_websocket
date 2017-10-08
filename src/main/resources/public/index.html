@@ -80,7 +80,15 @@
         	 seriesDataAss[0].push( { x: seriesDataAss[0].length, y: porkMessage.sensors[2].temperature } );
         	 seriesDataBack[0].push( { x: seriesDataBack[0].length, y: porkMessage.sensors[1].temperature } );
         	 seriesDataHead[0].push( { x: seriesDataHead[0].length, y: porkMessage.sensors[0].temperature } );
+        	 
+        	 //if(seriesDataFire[0].length>20){seriesDataFire[0].shift()};
+        	 //if(seriesDataAss[0].length>20){seriesDataAss[0].shift()};
+        	 //if(seriesDataBack[0].length>20){seriesDataBack[0].shift()};
+        	 //if(seriesDataHead[0].length>20){seriesDataHead[0].shift()};
+        	 
+        	 
              graph.update();
+             
         	 
          }
          
@@ -141,19 +149,27 @@
     	});	
       graph.render();
       
+      	var xAxis = new Rickshaw.Graph.Axis.Time({
+    		graph: graph
+    	});
+		xAxis.render();
+		
+		var yAxis = new Rickshaw.Graph.Axis.Y({
+		    graph: graph
+		});
+		yAxis.render();
+      
       var hoverDetail = new Rickshaw.Graph.HoverDetail( {
     		graph: graph,
     		formatter: function(series, x, y) {
-    			//var date = '<span class="date">' + new Date(x * 1000).toUTCString() + '</span>';
+    			var date = '<span class="date">' + new Date().toUTCString() + '</span>';
     			var swatch = '<span class="detail_swatch" style="background-color: ' + series.color + '"></span>';
-    			var content = swatch + series.name + ": " + parseInt(y) + '<br>';// + date;
+    			var content = swatch + series.name + ": " + parseInt(y) + '<br>' + date;
     			return content;
     		}
     	} );
   </script>
-      
-      
-      
+           
       
       <div id="sensorData" style="position:absolute;bottom:15%;height:15%;width:100%;border-style:solid;overflow: scroll;"></div>
       <div id="tips" style="position:absolute;bottom:0;height:15%;width:100%;border-style:solid;overflow: scroll;"></div>
